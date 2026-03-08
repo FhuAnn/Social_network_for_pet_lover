@@ -21,7 +21,7 @@ const server = http.createServer(app);
 // Integrate Socket.IO with the same server
 const io = new Server(server, {
   cors: {
-    origin: "*", // Allow all origins
+    origin: process.env.CORS_ORIGIN || "*",// Allow all origins
     methods: ["GET", "POST"], // Allowed methods
     allowedHeaders: ["Content-Type"], // Allowed headers
   },
