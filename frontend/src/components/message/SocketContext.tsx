@@ -5,8 +5,6 @@ import { MessageComponentType, EventSocket } from '../../types';
 import { RecentChat } from '../../types';
 import { useBackground } from './BackgroundContext';
 import { handleGetPostByPostId } from '../../sercives/api';
-const socket = io(process.env.REACT_APP_API_URL);
-
 interface SocketContextType {
   socket: Socket;
   messages: MessageComponentType[]
@@ -45,6 +43,14 @@ export const SocketProvider: React.FC<SocketProviderProps> = ({ children }) => {
   const [initialInput, setInitialInput] = useState<string>("")
   const currentEmail = localStorage.getItem("email")
   const { setBackgroundImageOver, setSelectedTheme } = useBackground()
+  const [socket] = useState(() => io(process.env.REACT_APP_API_URL!, {
+    transports: ["websocket"], // bỏ polling hoàn toàn khi chạy local
+  }))
+  useEffect(() => {
+    return () => {
+      socket.disconnect();
+    };
+  }, [socket]);
   useEffect(() => {
     socket.emit("connection", currentEmail)
     socket.emit("register", currentEmail)

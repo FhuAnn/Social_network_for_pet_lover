@@ -1,3 +1,4 @@
+require("dotenv").config();
 const express = require("express");
 const morgan = require("morgan");
 const api = require("./src/apis/index");
@@ -11,6 +12,8 @@ const port = process.env.PORT || 5000;
 // Middleware
 app.use(cors());
 app.use(morgan("combined"));
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
 // API routes
 api(app);
@@ -21,10 +24,11 @@ const server = http.createServer(app);
 // Integrate Socket.IO with the same server
 const io = new Server(server, {
   cors: {
-    origin: process.env.CORS_ORIGIN || "*",// Allow all origins
-    methods: ["GET", "POST"], // Allowed methods
-    allowedHeaders: ["Content-Type"], // Allowed headers
+    origin: process.env.CORS_ORIGIN || "*",
+    methods: ["GET", "POST"],
+    allowedHeaders: ["Content-Type"],
   },
+  transports: ["websocket", "polling"], // ưu tiên WebSocket, fallback polling
 });
 
 // Socket.IO logic
