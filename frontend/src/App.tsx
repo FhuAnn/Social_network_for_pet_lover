@@ -37,7 +37,7 @@ const App = () => {
   const state = location.state;
   return (
     <BackgroundProvider>
-      <SocketProvider>
+      {/* <SocketProvider> */}
         <SelectedUserProvider>
           <SnackbarProvider>
             <ThemeProvider theme={theme}>
@@ -79,7 +79,7 @@ const App = () => {
           </SnackbarProvider>
 
         </SelectedUserProvider>
-      </SocketProvider>
+      {/* </SocketProvider> */}
     </BackgroundProvider>
   );
 };

@@ -14,7 +14,7 @@ const ChatBot = () => {
   const scrollRef = useRef<HTMLDivElement>(null);
   const [petFavourites, setPetFavourites] = useState([]) 
   // const [initialInput, setInitialInput] = useState<string | null>(null);
-  const {initialInput, setInitialInput} = useSocket()
+ // const {initialInput, setInitialInput} = useSocket()
 
   useEffect(() => {
     if (scrollToBottom && scrollRef.current) {
@@ -33,12 +33,12 @@ const ChatBot = () => {
     getFavouritePets()
   },[])
 
-  useEffect(() => {
-    if (initialInput) {
-      setInitialInput(initialInput); // Preload the input with the initial message
-      setIsOpened(true); // Auto-open the chatbot
-    }
-  }, [initialInput]);
+  // useEffect(() => {
+  //   if (initialInput) {
+  //     setInitialInput(initialInput); // Preload the input with the initial message
+  //     setIsOpened(true); // Auto-open the chatbot
+  //   }
+  // }, [initialInput]);
 
 
   const shockwaveAnimation = keyframes`
