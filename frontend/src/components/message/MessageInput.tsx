@@ -50,7 +50,6 @@ const MessageInput: React.FC<MessageInputProps> = ({ recipent, isChatbot, petFav
   const { selectedUserEmail } = useSelectedUser()
 
 
-
   useEffect(() => {
     if (initialInput) {
       // Simulate submitting the initial message
@@ -152,7 +151,7 @@ const MessageInput: React.FC<MessageInputProps> = ({ recipent, isChatbot, petFav
         }
         setMessages((prevMessages) => [...prevMessages, newMessage])
 
-        const url = `${process.env.REACT_APP_API_URL}/api/v1/message/post?senderEmail=${currentEmail}&recipentEmail=${selectedUserEmail}&content=${message}`
+        const url = `${process.env.REACT_APP_API_URL}/api/v1/message/post?senderEmail=${currentEmail}&recipentEmail=${sentMessage?.recipentEmail}&content=${message}`
         console.log("send Mesage", sentMessage)
         sendMessage(sentMessage)
         setMessage("")
