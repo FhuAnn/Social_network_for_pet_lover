@@ -35,7 +35,7 @@ const Palette: React.FC<PaletteProps> = ({ }) => {
             "src": backgroundImageOver,
             "theme": tempSelectedColors,
             "senderEmail": senderEmail,
-            "recipentEmail": selectedUserEmail
+            "recipientEmail": selectedUserEmail
         }
 
         changeBackground(image)

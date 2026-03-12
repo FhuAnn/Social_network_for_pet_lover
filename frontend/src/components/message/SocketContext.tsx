@@ -118,14 +118,14 @@ export const SocketProvider: React.FC<SocketProviderProps> = ({ children }) => {
 
     socket.on("newMessage", (message) => {
       const newRecentChat: RecentChat = {
-        "_id": message.sendfrom,
+        "_id": message.sendFrom,
         "latestMessage": message.image ? "image" : message.content,
         "timeStamp": new Date().toISOString(),
         "userInfo": null,
         "image": message.image
       }
 
-      const url = `${process.env.REACT_APP_API_URL}/api/v1/message/post?senderEmail=${message.sendfrom}&recipentEmail=${currentEmail}&content=${message.content}`
+      const url = `${process.env.REACT_APP_API_URL}/api/v1/message/post?senderEmail=${message.sendFrom}&recipentEmail=${currentEmail}&content=${message.content}`
       const postMessage = async () => {
         try {
           const response = await fetch(url)
@@ -189,11 +189,11 @@ export const SocketProvider: React.FC<SocketProviderProps> = ({ children }) => {
   };
 
   const newComment = (comment: any) => {
-    socket.emit("newMessage", comment)
+    socket.emit("newComment", comment)
   }
 
   const newLike = (post: any) => {
-    socket.emit("newMessage", post)
+    socket.emit("newLike", post)
   }
 
   return (
