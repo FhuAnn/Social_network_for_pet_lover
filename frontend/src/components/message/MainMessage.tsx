@@ -47,7 +47,7 @@ const MainMessage = () => {
     //const { selectedUserEmail, setSelectedUserEmail } = useSelectedUser()
     const selectedUser: Recipent = {
         senderEmail: currentEmail || undefined,
-        recipentEmail: selectedUserEmail,
+        recipientEmail: selectedUserEmail,
         content: null
     }
 

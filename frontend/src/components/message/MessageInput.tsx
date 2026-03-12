@@ -86,7 +86,7 @@ const MessageInput: React.FC<MessageInputProps> = ({ recipent, isChatbot, petFav
       setMessages((prevMessages) => [...prevMessages, newMessage]);
 
 
-      const url = `${process.env.REACT_APP_API_URL}/api/v1/message/post?senderEmail=${currentEmail}&recipentEmail=${sentMessage?.recipentEmail}&content=${message}&image=${imageLink}`
+      const url = `${process.env.REACT_APP_API_URL}/api/v1/message/post?senderEmail=${currentEmail}&recipentEmail=${sentMessage?.recipientEmail}&content=${message}&image=${imageLink}`
         console.log("send Mesage", sentMessage)
         sendMessage(sentMessage)
         if(sentMessage){
@@ -151,7 +151,7 @@ const MessageInput: React.FC<MessageInputProps> = ({ recipent, isChatbot, petFav
         }
         setMessages((prevMessages) => [...prevMessages, newMessage])
 
-        const url = `${process.env.REACT_APP_API_URL}/api/v1/message/post?senderEmail=${currentEmail}&recipentEmail=${sentMessage?.recipentEmail}&content=${message}`
+        const url = `${process.env.REACT_APP_API_URL}/api/v1/message/post?senderEmail=${currentEmail}&recipentEmail=${sentMessage?.recipientEmail}&content=${message}`
         console.log("send Mesage", sentMessage)
         sendMessage(sentMessage)
         setMessage("")

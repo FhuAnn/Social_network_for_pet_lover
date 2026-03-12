@@ -35,7 +35,7 @@ export interface RecentChatInSideBar {
 }
 
 export interface Recipent {
-  recipentEmail: string | undefined;
+  recipientEmail: string | undefined;
   senderEmail: string | undefined;
   content: string | null;
   image?: string
