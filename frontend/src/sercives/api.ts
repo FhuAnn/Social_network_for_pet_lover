@@ -26,19 +26,22 @@ export const getUserByUserId = async (userId: string | undefined | null) => {
 };
 export async function handleFollow(
   follower: string | null,
-  followingId: string | undefined
+  followingId: string | undefined,
 ) {
   try {
-    const response = await fetch(`${process.env.REACT_APP_API_URL}/api/v1/follow/create`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
+    const response = await fetch(
+      `${process.env.REACT_APP_API_URL}/api/v1/follow/create`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          followerId: follower,
+          followingId: followingId,
+        }),
       },
-      body: JSON.stringify({
-        followerId: follower,
-        followingId: followingId,
-      }),
-    });
+    );
     return response;
   } catch (error) {
     console.error("Error following user:", error);
@@ -47,7 +50,7 @@ export async function handleFollow(
 }
 export async function checkFollowed(
   follower: string | null,
-  followingId: string | undefined
+  followingId: string | undefined,
 ) {
   try {
     const response = await fetch(
@@ -61,7 +64,7 @@ export async function checkFollowed(
           followerId: follower,
           followingId: followingId,
         }),
-      }
+      },
     );
     return response;
   } catch (error) {
@@ -73,17 +76,20 @@ export async function handleLikePost(postId: string | undefined) {
   if (postId == undefined) return;
 
   try {
-    const response = await fetch(`${process.env.REACT_APP_API_URL}/api/v1/like/likepost`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
+    const response = await fetch(
+      `${process.env.REACT_APP_API_URL}/api/v1/like/likepost`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          userId: localStorage.getItem("userId"),
+          targetId: postId,
+          targetType: "post",
+        }),
       },
-      body: JSON.stringify({
-        userId: localStorage.getItem("userId"),
-        targetId: postId,
-        targetType: "post",
-      }),
-    });
+    );
     if (!response.ok) {
       throw new Error("Failed to like post");
     }
@@ -102,7 +108,7 @@ export async function handleGetFavouritedPetByUserId() {
       `${process.env.REACT_APP_API_URL}/api/v1/petuser/favourited/getbyuserid?userId=${userId}`,
       {
         method: "Get",
-      }
+      },
     );
     if (!response.ok) {
       throw new Error("Failed to like post");
@@ -131,7 +137,7 @@ export async function createPetUserRelationship(petId: string | null) {
           userId: localStorage.getItem("userId"),
           petId: petId,
         }),
-      }
+      },
     );
     if (!response.ok) {
       throw new Error("Failed to create petuser");
@@ -150,7 +156,7 @@ export async function handleDeletePetUserById(petUserId: String | undefined) {
       `${process.env.REACT_APP_API_URL}/api/v1/petuser/delete?petUserId=${petUserId}`,
       {
         method: "POST",
-      }
+      },
     );
     if (!response.ok) {
       throw new Error("Failed to like post");
@@ -165,7 +171,7 @@ export async function handleDeletePetUserById(petUserId: String | undefined) {
 
 export async function isChecked(
   userId: string | undefined | null,
-  petId: string
+  petId: string,
 ) {
   if (userId === undefined || petId === undefined) return;
   try {
@@ -173,7 +179,7 @@ export async function isChecked(
       `${process.env.REACT_APP_API_URL}/api/v1/petuser/checksaved?userId=${userId}&petId=${petId}`,
       {
         method: "GET",
-      }
+      },
     );
     if (!response.ok) {
       throw new Error("Failed to like post");
@@ -188,7 +194,7 @@ export async function isChecked(
 
 //FavvouritePost
 export async function createPostUserRelationship(
-  postId: string | null | undefined
+  postId: string | null | undefined,
 ) {
   if (postId === undefined) return;
   try {
@@ -203,7 +209,7 @@ export async function createPostUserRelationship(
           userId: localStorage.getItem("userId"),
           postId: postId,
         }),
-      }
+      },
     );
     if (!response.ok) {
       throw new Error("Failed to create postuser");
@@ -222,7 +228,7 @@ export async function handleGetFavouritedPostByUserId() {
       `${process.env.REACT_APP_API_URL}/api/v1/postuser/favourited/getbyuserid?userId=${userId}`,
       {
         method: "Get",
-      }
+      },
     );
     if (!response.ok) {
       throw new Error("Failed to like post");
@@ -244,7 +250,7 @@ export async function handleDeletePostUserById(postUserId: String | undefined) {
       `${process.env.REACT_APP_API_URL}/api/v1/postuser/delete?postUserId=${postUserId}`,
       {
         method: "POST",
-      }
+      },
     );
     if (!response.ok) {
       throw new Error("Failed to delete favourtie post");
@@ -259,7 +265,7 @@ export async function handleDeletePostUserById(postUserId: String | undefined) {
 
 export async function handleGetPostByPostId(
   postId: String | null | undefined,
-  userId: string | null
+  userId: string | null,
 ) {
   if (postId === undefined) return;
   try {
@@ -267,7 +273,7 @@ export async function handleGetPostByPostId(
       `${process.env.REACT_APP_API_URL}/api/v1/post/getpostbypostid?postId=${postId}&userAccessId=${userId}`,
       {
         method: "POST",
-      }
+      },
     );
     if (!response.ok) {
       throw new Error("Failed to delete favourtie post");
@@ -281,10 +287,8 @@ export async function handleGetPostByPostId(
 }
 
 export async function handleLikeAPI(postId: string | undefined, type: string) {
-
   const handleSocketEmit = async (eventSocketList: EventSocket[]) => {
-
-    const url = `${process.env.REACT_APP_API_URL}/api/v1/notification/create`
+    const url = `${process.env.REACT_APP_API_URL}/api/v1/notification/create`;
 
     try {
       debugger;
@@ -293,31 +297,33 @@ export async function handleLikeAPI(postId: string | undefined, type: string) {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(eventSocketList)
-      })
+        body: JSON.stringify(eventSocketList),
+      });
 
       if (!response.ok) {
-        console.log("error in posting event")
+        console.log("error in posting event");
       }
 
-      console.log("posting event successfully")
+      console.log("posting event successfully");
     } catch (e) {
-      console.log("error", e)
+      console.log("error", e);
     }
-
-  }
+  };
   try {
-    const response = await fetch(`${process.env.REACT_APP_API_URL}/api/v1/like/likepost`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
+    const response = await fetch(
+      `${process.env.REACT_APP_API_URL}/api/v1/like/likepost`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          userId: localStorage.getItem("userId"),
+          targetId: postId,
+          targetType: type,
+        }),
       },
-      body: JSON.stringify({
-        userId: localStorage.getItem("userId"),
-        targetId: postId,
-        targetType: type,
-      }),
-    });
+    );
     if (!response.ok) {
       throw new Error("Failed to like post");
     }
@@ -325,7 +331,7 @@ export async function handleLikeAPI(postId: string | undefined, type: string) {
     debugger;
     const res = await handleGetPostByPostId(
       postId,
-      localStorage.getItem("userId")
+      localStorage.getItem("userId"),
     );
     const postOwnerEmail = res.userInfo.email;
     console.log("res", res);
@@ -336,280 +342,286 @@ export async function handleLikeAPI(postId: string | undefined, type: string) {
       type: "like",
     };
 
-
-      const infoUrl = `${process.env.REACT_APP_API_URL}/api/v1/user/info?email=${localStorage.getItem("email")}`;
-      try {
-        const response = await fetch(infoUrl, {
-          method: "GET",
-        });
-        if (!response.ok) {
-          throw new Error("Error in getting user");
-        }
-
-        const data = await response.json();
-
-        const userAvatar = data.userInfo.avatar
-        const userName = `${data.userInfo.firstname} ${data.userInfo.lastname}`
-        const event: EventSocket = {
-          eventType: "like",
-          postId: postId,
-          userName: userName,
-          userAvatar: userAvatar,
-          createdAt: new Date,
-          postOwnerEmail: postOwnerEmail
-        }
-
-        handleSocketEmit([event])
-      } catch(e) {
-        console.log(e)
+    const infoUrl = `${process.env.REACT_APP_API_URL}/api/v1/user/info?email=${localStorage.getItem("email")}`;
+    try {
+      const response = await fetch(infoUrl, {
+        method: "GET",
+      });
+      if (!response.ok) {
+        throw new Error("Error in getting user");
       }
 
+      const data = await response.json();
+
+      const userAvatar = data.userInfo.avatar;
+      const userName = `${data.userInfo.firstname} ${data.userInfo.lastname}`;
+      const event: EventSocket = {
+        eventType: "like",
+        postId: postId,
+        userName: userName,
+        userAvatar: userAvatar,
+        createdAt: new Date(),
+        postOwnerEmail: postOwnerEmail,
+      };
+
+      handleSocketEmit([event]);
+    } catch (e) {
+      console.log(e);
+    }
+
     socket.emit("newLike", like);
-      const result = await response.json();
-      //setCurrentPost(result.updatedPost);
-      //setPost(result.updatedPost);
-      //setIsLiked(result.updatedPost.isLiked)
-      return result;
-    
-  }catch (e) {
+    const result = await response.json();
+    //setCurrentPost(result.updatedPost);
+    //setPost(result.updatedPost);
+    //setIsLiked(result.updatedPost.isLiked)
+    return result;
+  } catch (e) {
     console.error(e);
   }
 }
 
 export async function handleDeleteCommentAPI(commentId: string | undefined) {
-    try {
-      const response = await fetch(
-        `${process.env.REACT_APP_API_URL}/api/v1/comment/delete?commentId=${commentId}`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
-      if (!response.ok) {
-        throw new Error("Failed to comment post");
-      }
-      const result = await response.json();
-      return result;
-    } catch (e) {
-      console.error(e);
+  try {
+    const response = await fetch(
+      `${process.env.REACT_APP_API_URL}/api/v1/comment/delete?commentId=${commentId}`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      },
+    );
+    if (!response.ok) {
+      throw new Error("Failed to comment post");
     }
+    const result = await response.json();
+    return result;
+  } catch (e) {
+    console.error(e);
   }
+}
 
-  export async function handleUpdateNameAPI(
-    lastName: String | undefined,
-    firstName: String | undefined,
-    userId: String | undefined
-  ) {
-    try {
-      const response = await fetch(
-        `${process.env.REACT_APP_API_URL}/api/v1/user/updatename`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            userId: userId,
-            lastName: lastName,
-            firstName: firstName,
-          }),
-        }
-      );
-      if (!response.ok) {
-        throw new Error("Failed to comment post");
-      }
-      const result = await response.json();
-      return result;
-    } catch (e) {
-      console.error(e);
+export async function handleUpdateNameAPI(
+  lastName: String | undefined,
+  firstName: String | undefined,
+  userId: String | undefined,
+) {
+  try {
+    const response = await fetch(
+      `${process.env.REACT_APP_API_URL}/api/v1/user/updatename`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          userId: userId,
+          lastName: lastName,
+          firstName: firstName,
+        }),
+      },
+    );
+    if (!response.ok) {
+      throw new Error("Failed to comment post");
     }
+    const result = await response.json();
+    return result;
+  } catch (e) {
+    console.error(e);
   }
+}
 
-  export async function handleUpdateDescriptionAPI(
-    description: String | undefined,
-    userId: String | undefined
-  ) {
-    try {
-      const response = await fetch(
-        `${process.env.REACT_APP_API_URL}/api/v1/user/updatedescription`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            userId: userId,
-            description: description,
-          }),
-        }
-      );
-      if (!response.ok) {
-        throw new Error("Failed to comment post");
-      }
-      const result = await response.json();
-      return result;
-    } catch (e) {
-      console.error(e);
+export async function handleUpdateDescriptionAPI(
+  description: String | undefined,
+  userId: String | undefined,
+) {
+  try {
+    const response = await fetch(
+      `${process.env.REACT_APP_API_URL}/api/v1/user/updatedescription`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          userId: userId,
+          description: description,
+        }),
+      },
+    );
+    if (!response.ok) {
+      throw new Error("Failed to comment post");
     }
+    const result = await response.json();
+    return result;
+  } catch (e) {
+    console.error(e);
   }
+}
 
-  export async function handleUpdateAvatarAPI(
-    imageUrl: String | undefined,
-    userId: String | undefined
-  ) {
-    try {
-      const response = await fetch(
-        `${process.env.REACT_APP_API_URL}/api/v1/user/updateAvatar`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            userId: userId,
-            imageUrl: imageUrl,
-          }),
-        }
-      );
-      if (!response.ok) {
-        throw new Error("Failed to comment post");
-      }
-      const result = await response.json();
-      return result;
-    } catch (e) {
-      console.error(e);
+export async function handleUpdateAvatarAPI(
+  imageUrl: String | undefined,
+  userId: String | undefined,
+) {
+  try {
+    const response = await fetch(
+      `${process.env.REACT_APP_API_URL}/api/v1/user/updateAvatar`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          userId: userId,
+          imageUrl: imageUrl,
+        }),
+      },
+    );
+    if (!response.ok) {
+      throw new Error("Failed to comment post");
     }
+    const result = await response.json();
+    return result;
+  } catch (e) {
+    console.error(e);
   }
+}
 
-  export async function handleUpdatePostAPI(
-    title: String | undefined,
-    content: String | undefined,
-    images: String[],
-    postId: String | undefined
-  ) {
-    //console.log("images",images)
-    try {
-      const response = await fetch(
-        `${process.env.REACT_APP_API_URL}/api/v1/post/updatepost`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            postId: postId,
-            title: title,
-            content: content,
-            images: images,
-          }),
-        }
-      );
-      if (!response.ok) {
-        throw new Error("Failed to comment post");
-      }
-      const result = await response.json();
-      return result;
-    } catch (e) {
-      console.error(e);
+export async function handleUpdatePostAPI(
+  title: String | undefined,
+  content: String | undefined,
+  images: String[],
+  postId: String | undefined,
+) {
+  //console.log("images",images)
+  try {
+    const response = await fetch(
+      `${process.env.REACT_APP_API_URL}/api/v1/post/updatepost`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          postId: postId,
+          title: title,
+          content: content,
+          images: images,
+        }),
+      },
+    );
+    if (!response.ok) {
+      throw new Error("Failed to comment post");
     }
+    const result = await response.json();
+    return result;
+  } catch (e) {
+    console.error(e);
   }
+}
 
-  export async function handleUpdateCommentAPI(
-    content: String | undefined,
-    commentId: String | undefined
-  ) {
-    //console.log("images",images)
-    try {
-      const response = await fetch(
-        `${process.env.REACT_APP_API_URL}/api/v1/comment/update`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            contentComment: content,
-            commentId: commentId,
-          }),
-        }
-      );
-      if (!response.ok) {
-        throw new Error("Failed to updateComment");
-      }
-      const result = await response.json();
-      return result;
-    } catch (e) {
-      console.error(e);
+export async function handleUpdateCommentAPI(
+  content: String | undefined,
+  commentId: String | undefined,
+) {
+  //console.log("images",images)
+  try {
+    const response = await fetch(
+      `${process.env.REACT_APP_API_URL}/api/v1/comment/update`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          contentComment: content,
+          commentId: commentId,
+        }),
+      },
+    );
+    if (!response.ok) {
+      throw new Error("Failed to updateComment");
     }
+    const result = await response.json();
+    return result;
+  } catch (e) {
+    console.error(e);
   }
+}
 
-  export async function handleGetFollowingByUserId(userId: string | null | undefined, searchString: string | null = "") {
-    try {
-      const response = await fetch(
-        `${process.env.REACT_APP_API_URL}/api/v1/follow/getfollowingbyuserid?followerId=${userId}&searchString=${searchString}`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          }
-        }
-      );
-      if (!response.ok) {
-        throw new Error("Failed to getFollowingUsers");
-      }
-      const result = await response.json();
-      return result.followingUsers;
-    } catch (e) {
-      console.error(e);
+export async function handleGetFollowingByUserId(
+  userId: string | null | undefined,
+  searchString: string | null = "",
+) {
+  try {
+    const response = await fetch(
+      `${process.env.REACT_APP_API_URL}/api/v1/follow/getfollowingbyuserid?followerId=${userId}&searchString=${searchString}`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      },
+    );
+    if (!response.ok) {
+      throw new Error("Failed to getFollowingUsers");
     }
+    const result = await response.json();
+    return result.followingUsers;
+  } catch (e) {
+    console.error(e);
   }
+}
 
-  export async function handleGetFollowerByUserId(userId: string | null | undefined, searchString: string | null = "") {
-    try {
-      const response = await fetch(
-        `${process.env.REACT_APP_API_URL}/api/v1/follow/getfollowerbyuserid?followingId=${userId}&searchString=${searchString}`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          }
-        }
-      );
-      if (!response.ok) {
-        throw new Error("Failed to getFollowingUsers");
-      }
-      const result = await response.json();
-      return result.followerUsers;
-    } catch (e) {
-      console.error(e);
+export async function handleGetFollowerByUserId(
+  userId: string | null | undefined,
+  searchString: string | null = "",
+) {
+  try {
+    const response = await fetch(
+      `${process.env.REACT_APP_API_URL}/api/v1/follow/getfollowerbyuserid?followingId=${userId}&searchString=${searchString}`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      },
+    );
+    if (!response.ok) {
+      throw new Error("Failed to getFollowingUsers");
     }
+    const result = await response.json();
+    return result.followerUsers;
+  } catch (e) {
+    console.error(e);
   }
+}
 
-  export async function handleDeleteFollow(followerId: string | undefined, followingId: string | undefined) {
-    try {
-      const response = await fetch(
-        `${process.env.REACT_APP_API_URL}/api/v1/follow/deletefollow?followerId=${followerId}&followingId=${followingId}`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          }
-        }
-      );
-      if (!response.ok) {
-        throw new Error("Failed to getFollowingUsers");
-      }
-      const result = await response.json();
-      return result.unfollowInfo;
-    } catch (e) {
-      console.error(e);
+export async function handleDeleteFollow(
+  followerId: string | undefined,
+  followingId: string | undefined,
+) {
+  try {
+    const response = await fetch(
+      `${process.env.REACT_APP_API_URL}/api/v1/follow/deletefollow?followerId=${followerId}&followingId=${followingId}`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      },
+    );
+    if (!response.ok) {
+      throw new Error("Failed to getFollowingUsers");
     }
+    const result = await response.json();
+    return result.unfollowInfo;
+  } catch (e) {
+    console.error(e);
   }
+}
 
-export async function handleSearchUserByUsername(searchString:string|null)
-{
+export async function handleSearchUserByUsername(searchString: string | null) {
   try {
     const response = await fetch(
       `${process.env.REACT_APP_API_URL}/api/v1/user/searchuserbyusername?searchString=${searchString}`,
@@ -617,8 +629,8 @@ export async function handleSearchUserByUsername(searchString:string|null)
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-        }
-      }
+        },
+      },
     );
     if (!response.ok) {
       throw new Error("Failed to getFollowingUsers");
@@ -630,10 +642,12 @@ export async function handleSearchUserByUsername(searchString:string|null)
   }
 }
 
-
-export async function handleWriteHistoryAPI(userId:string|null,targetId:string,type:string)
-{
-  console.log("handleWriteHistory",userId,targetId,type)
+export async function handleWriteHistoryAPI(
+  userId: string | null,
+  targetId: string,
+  type: string,
+) {
+  console.log("handleWriteHistory", userId, targetId, type);
   try {
     const response = await fetch(
       `${process.env.REACT_APP_API_URL}/api/v1/history/create`,
@@ -645,9 +659,9 @@ export async function handleWriteHistoryAPI(userId:string|null,targetId:string,t
         body: JSON.stringify({
           userId: userId,
           targetId: targetId,
-          type:type
+          type: type,
         }),
-      }
+      },
     );
     if (!response.ok) {
       throw new Error("Failed to getFollowingUsers");
@@ -659,8 +673,11 @@ export async function handleWriteHistoryAPI(userId:string|null,targetId:string,t
   }
 }
 
-export async function handleDeleteHistoryByIdAPI(userId:string|null,targetId:string,type:string)
-{
+export async function handleDeleteHistoryByIdAPI(
+  userId: string | null,
+  targetId: string,
+  type: string,
+) {
   try {
     const response = await fetch(
       `${process.env.REACT_APP_API_URL}/api/v1/history/delete`,
@@ -672,9 +689,9 @@ export async function handleDeleteHistoryByIdAPI(userId:string|null,targetId:str
         body: JSON.stringify({
           userId: userId,
           targetId: targetId,
-          type:type
+          type: type,
         }),
-      }
+      },
     );
     if (!response.ok) {
       throw new Error("Failed to getFollowingUsers");
@@ -686,8 +703,7 @@ export async function handleDeleteHistoryByIdAPI(userId:string|null,targetId:str
   }
 }
 
-export async function handleGetSearchListByIdAPI(userId:string|null)
-{
+export async function handleGetSearchListByIdAPI(userId: string | null) {
   try {
     const response = await fetch(
       `${process.env.REACT_APP_API_URL}/api/v1/history/gethistorysearch`,
@@ -699,7 +715,7 @@ export async function handleGetSearchListByIdAPI(userId:string|null)
         body: JSON.stringify({
           userId: userId,
         }),
-      }
+      },
     );
     if (!response.ok) {
       throw new Error("Failed to getFollowingUsers");

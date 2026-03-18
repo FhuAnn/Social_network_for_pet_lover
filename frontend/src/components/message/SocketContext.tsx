@@ -5,8 +5,6 @@ import { MessageComponentType, EventSocket } from '../../types';
 import { RecentChat } from '../../types';
 import { useBackground } from './BackgroundContext';
 import { handleGetPostByPostId } from '../../sercives/api';
-const socket = io(process.env.REACT_APP_API_URL);
-
 interface SocketContextType {
   socket: Socket;
   messages: MessageComponentType[]
@@ -45,6 +43,14 @@ export const SocketProvider: React.FC<SocketProviderProps> = ({ children }) => {
   const [initialInput, setInitialInput] = useState<string>("")
   const currentEmail = localStorage.getItem("email")
   const { setBackgroundImageOver, setSelectedTheme } = useBackground()
+  const [socket] = useState(() => io(process.env.REACT_APP_API_URL!, {
+    transports: ["websocket"], // bỏ polling hoàn toàn khi chạy local
+  }))
+  useEffect(() => {
+    return () => {
+      socket.disconnect();
+    };
+  }, [socket]);
   useEffect(() => {
     socket.emit("connection", currentEmail)
     socket.emit("register", currentEmail)
@@ -112,14 +118,14 @@ export const SocketProvider: React.FC<SocketProviderProps> = ({ children }) => {
 
     socket.on("newMessage", (message) => {
       const newRecentChat: RecentChat = {
-        "_id": message.sendfrom,
+        "_id": message.sendFrom,
         "latestMessage": message.image ? "image" : message.content,
         "timeStamp": new Date().toISOString(),
         "userInfo": null,
         "image": message.image
       }
 
-      const url = `${process.env.REACT_APP_API_URL}/api/v1/message/post?senderEmail=${message.sendfrom}&recipentEmail=${currentEmail}&content=${message.content}`
+      const url = `${process.env.REACT_APP_API_URL}/api/v1/message/post?senderEmail=${message.sendFrom}&recipentEmail=${currentEmail}&content=${message.content}`
       const postMessage = async () => {
         try {
           const response = await fetch(url)
@@ -183,11 +189,11 @@ export const SocketProvider: React.FC<SocketProviderProps> = ({ children }) => {
   };
 
   const newComment = (comment: any) => {
-    socket.emit("newMessage", comment)
+    socket.emit("newComment", comment)
   }
 
   const newLike = (post: any) => {
-    socket.emit("newMessage", post)
+    socket.emit("newLike", post)
   }
 
   return (

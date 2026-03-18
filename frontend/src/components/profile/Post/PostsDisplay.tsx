@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from "react";
+import React, { useState, useEffect, useContext, useRef } from "react";
 import PostInformationCard from "./PostInformationCard";
 import {
   Avatar,
@@ -36,77 +36,83 @@ import { useParams } from "react-router-dom";
 const PostsDisplay = () => {
   const [isDisplayTool, setIsDisplayTool] = useState(false);
   const [postsData, setPostsData] = useState<Post[]>([]);
-  const [page,setPage] = useState(0)
   const [user, setUser] = useState<User>();
   const { url, setUrl } = useContext(AccessUrlContext)!;
+
+  // Dùng ref để tránh stale closure trong IntersectionObserver
+  const pageRef = useRef(0);
+  const hasMoreRef = useRef(true);
+  const isFetchingRef = useRef(false);
+  const urlRef = useRef(url);
+
+  // Giữ urlRef luôn đồng bộ với url mới nhất
+  useEffect(() => {
+    urlRef.current = url;
+  }, [url]);
+
   const toggleDisplayToolBox = () => {
     setIsDisplayTool((prev) => !prev);
   };
 
+  const fetchNext = async () => {
+    const currentUrl = urlRef.current;
+    if (!currentUrl || !hasMoreRef.current || isFetchingRef.current) return;
+    isFetchingRef.current = true;
+    const nextPage = pageRef.current + 1;
+    try {
+      const response = await fetch(`${currentUrl}&page=${nextPage}&limit=2`, {
+        method: "GET",
+      });
+      if (!response.ok) throw new Error("Error in getting posts");
+      const data = await response.json();
+      if (data.posts && data.posts.length > 0) {
+        pageRef.current = nextPage;
+        setPostsData((prev) => [...prev, ...data.posts]);
+        setUser(data.user);
+      } else {
+        hasMoreRef.current = false;
+      }
+    } catch (e) {
+      console.error("Error fetching data:", e);
+    } finally {
+      isFetchingRef.current = false;
+    }
+  };
+
   const updatePostsState = async () => {
     try {
-      fetchData();
+      fetchNext();
     } catch (error) {
       console.error("Error updating post state:", error);
     }
   };
+
+  // Reset và load trang đầu khi url thay đổi
   useEffect(() => {
-    fetchData(); // Call fetchData inside useEffect
-  }, [url]);
-  // const fetchData = async () => {
-  //   if (!url) return;
-  //   try {
-  //     const response = await fetch(url, {
-  //       method: "GET",
-  //     });
-  //     if (!response.ok) {
-  //       throw new Error("Error in getting message");
-  //     }
-  //     const data = await response.json();
-  //     setPostsData(data.posts);
-  //     setUser(data.user);
-  //   } catch (e) {
-  //     console.error("Error fetching data:", e);
-  //   }
-  // };
-  const fetchData = async (page: number = 1, limit: number = 2) => {
     if (!url) return;
-    console.log("abcde",`${url}&page=${page}&limit=${limit}`)
-    try {
-      const response = await fetch(`${url}&page=${page}&limit=${limit}`, {
-        method: "GET",
-      });
-      if (!response.ok) {
-        throw new Error("Error in getting posts");
-      }
-      const data = await response.json();
-      if (data.posts.length > 0) {
-        console.log('fetchaskdja')
-        setPostsData((prev) => [...prev, ...data.posts]); // Append new data
-        setUser(data.user);
-      } else {
-        console.log("No more posts to load");
-      }
-    } catch (e) {
-      console.error("Error fetching data:", e);
-    }
-  };
+    pageRef.current = 0;
+    hasMoreRef.current = true;
+    isFetchingRef.current = false;
+    setPostsData([]);
+    fetchNext();
+  }, [url]);
+
+  // Setup observer CHỈ 1 LẦN — không phụ thuộc page
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
         if (entries[0].isIntersecting) {
-          fetchData(page + 1); // Tăng page lên và gọi API
-          setPage((prev) => prev + 1);
+          fetchNext();
         }
       },
-      { threshold: 1 }
+      { threshold: 1 },
     );
 
     const loadMoreTrigger = document.querySelector("#load-more-trigger");
     if (loadMoreTrigger) observer.observe(loadMoreTrigger);
 
     return () => observer.disconnect();
-  }, [page]);
+  }, []);
   // const handleHide = () => {
   //   console.log("Hide clicked");
   // };
@@ -128,7 +134,7 @@ const PostsDisplay = () => {
             );
           })
         : "Don't have any post"}
-        <div id="load-more-trigger"></div> 
+      <div id="load-more-trigger"></div>
     </Box>
   );
 };

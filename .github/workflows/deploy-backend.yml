@@ -1,0 +1,74 @@
+name: Deploy Backend to EC2
+
+on:
+  push:
+    branches: [dev]
+    paths:
+      - 'backend/**'
+      - '.github/workflows/deploy-backend.yml'
+
+env:
+  ECR_REPOSITORY: pet-social-backend
+  IMAGE_TAG: ${{ github.sha }}
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Build, tag, and push Docker image to ECR
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        run: |
+          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG ./backend
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+          docker tag $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG $ECR_REGISTRY/$ECR_REPOSITORY:latest
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:latest
+
+      - name: Deploy to EC2 via SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ubuntu
+          key: ${{ secrets.EC2_SSH_KEY }}
+          envs: AWS_ACCOUNT_ID,AWS_REGION
+          script: |
+            # Login to ECR from EC2
+            aws ecr get-login-password --region $AWS_REGION | \
+              docker login --username AWS --password-stdin \
+              $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com
+
+            # Pull latest image
+            docker pull $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/pet-social-backend:latest
+
+            # Stop and remove old container (ignore error if not running)
+            docker stop pet-social || true
+            docker rm pet-social || true
+
+            # Run new container using .env file on EC2
+            docker run -d \
+              --name pet-social \
+              --restart unless-stopped \
+              --env-file /home/ubuntu/app/.env \
+              -p 5000:5000 \
+              $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/pet-social-backend:latest
+
+            # Clean up dangling images
+            docker image prune -f
+        env:
+          AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
+          AWS_REGION: ${{ secrets.AWS_REGION }}
